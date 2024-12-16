@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
+  const fullName = formData.get("fullName")?.toString();
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
@@ -19,7 +20,10 @@ export const signUpAction = async (formData: FormData) => {
     );
   }
 
-  const { error } = await supabase.auth.signUp({
+  const {
+    error: authError,
+    data: { user },
+  } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -27,16 +31,30 @@ export const signUpAction = async (formData: FormData) => {
     },
   });
 
-  if (error) {
-    console.error(error.code + " " + error.message);
-    return encodedRedirect("error", "/auth/sign-up", error.message);
-  } else {
-    return encodedRedirect(
-      "success",
-      "/auth/sign-up",
-      "Thanks for signing up! Please check your email for a verification link."
-    );
+  if (authError) {
+    console.error(authError.code + " " + authError.message);
+    return encodedRedirect("error", "/auth/sign-up", authError.message);
   }
+
+  const { error: dbError } = await supabase.from("profiles").insert({
+    id: user?.id,
+    full_name: fullName,
+    username: "Salvatore",
+    image: null,
+  });
+
+  if (dbError) {
+    console.error(dbError.code + " " + dbError.message);
+
+    await supabase.auth.admin.deleteUser(user?.id || "");
+    return encodedRedirect("error", "/auth/sign-up", dbError.message);
+  }
+
+  return encodedRedirect(
+    "success",
+    "/auth/sign-up",
+    "Thanks for signing up! Please check your email for a verification link."
+  );
 };
 
 export const signInAction = async (formData: FormData) => {

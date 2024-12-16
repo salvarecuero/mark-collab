@@ -52,6 +52,8 @@ export const updateSession = async (request: NextRequest) => {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
+    if (user.data.user?.id) response.cookies.set("user-id", user.data.user.id);
+
     return response;
   } catch (e) {
     // If you are here, a Supabase client could not be created!

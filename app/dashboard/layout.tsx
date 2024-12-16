@@ -1,4 +1,5 @@
-import "./globals.css";
+import Header from "@/components/Header";
+import "../globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -6,7 +7,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
+  title: "Mark-Collab",
   description: "The fastest way to build apps with Next.js and Supabase",
 };
 
@@ -16,8 +17,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
-    </html>
+    <main>
+      <Header />
+      {children}
+    </main>
   );
 }
