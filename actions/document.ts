@@ -16,6 +16,7 @@ export async function createDocument(
       owner_id: userId,
       is_public: false,
     })
+    .select()
     .single();
 
   if (error) {
@@ -77,31 +78,21 @@ export async function deleteDocument(documentId: string): Promise<void> {
   }
 }
 
-export async function joinPublicDocument(documentId: string, userId: string) {
-  const supabase = createClient();
-
-  // Verificar si el documento es público
-  const { data: document, error: documentError } = await supabase
-    .from("documents")
-    .select("is_public")
-    .eq("id", documentId)
-    .single();
-
-  if (documentError) {
-    console.error("Error fetching document:", documentError);
-    throw documentError;
-  }
-
-  if (!document?.is_public) {
-    throw new Error("This document is not public.");
-  }
-
+export async function joinPublicDocument(
+  documentId: string,
+  userId: string,
+  permission: "read" | "write" = "read"
+) {
   // Agregar al usuario como colaborador
-  const { data, error } = await supabase.from("collaborators").insert({
-    document_id: documentId,
-    user_id: userId,
-    permission_level: "read", // Por defecto, acceso de solo lectura
-  });
+  const { data, error } = await supabase
+    .from("collaborators")
+    .insert({
+      document_id: documentId,
+      user_id: userId,
+      permission_level: permission,
+    })
+    .select()
+    .single();
 
   if (error) {
     console.error("Error joining public document:", error);

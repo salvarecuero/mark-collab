@@ -1,13 +1,21 @@
 "use client";
 
+import { createDocument } from "@/actions/document";
 import DocumentList from "@/components/DocumentList";
-import { useRealtimeDocuments } from "@/hooks/useRealtimeDocuments";
 import { useUser } from "@/hooks/useUser";
-import { createDocument } from "./actions";
+import { useUserDocuments } from "@/hooks/useUserDocuments";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const user = useUser();
-  const { documents, loading } = useRealtimeDocuments(user?.id || "");
+  const { documents, loading } = useUserDocuments(user?.id || "");
+  const router = useRouter();
+
+  const handleCreateDocument = async () => {
+    const document = await createDocument("Untitled", "", user?.id || "");
+
+    router.push(`/document/${document.id}`);
+  };
 
   return (
     <div>
@@ -16,11 +24,7 @@ export default function Dashboard() {
       ) : (
         <>
           <h1>Dashboard</h1>
-          <button
-            onClick={() => createDocument("Untitled", "", user?.id || "")}
-          >
-            Create Document
-          </button>
+          <button onClick={handleCreateDocument}>Create Document</button>
           <DocumentList documents={documents} />
         </>
       )}

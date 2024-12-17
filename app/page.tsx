@@ -1,4 +1,3 @@
-import AuthButton from "@/components/header-auth";
 import Link from "next/link";
 
 export default async function Index() {
