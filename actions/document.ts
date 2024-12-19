@@ -1,80 +1,53 @@
+import { API_ROUTES } from "@/constants/routes";
 import { Document } from "@/types/document";
-import { createClient } from "@/utils/supabase/client";
-
-const supabase = createClient();
 
 export async function createDocument(
   title: string,
   content: string,
   userId: string
 ): Promise<Document> {
-  const { data, error } = await supabase
-    .from("documents")
-    .insert({
-      title,
-      content,
-      owner_id: userId,
-      is_public: false,
-    })
-    .select()
-    .single();
+  const response = await fetch(API_ROUTES.DOCUMENTS.CREATE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, content, userId }),
+  });
 
-  if (error) {
-    console.error("Error creating document:", error);
-    throw error;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message);
   }
 
-  return data;
+  return response.json();
 }
 
 export async function updateDocument(
   documentId: string,
   updates: Partial<{ title: string; content: string; is_public: boolean }>
 ) {
-  const supabase = createClient();
+  const url = API_ROUTES.DOCUMENTS.UPDATE.replace(":id", documentId);
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
 
-  // Obtener el estado actual del documento
-  const { data: currentDocument, error: fetchError } = await supabase
-    .from("documents")
-    .select("is_public")
-    .eq("id", documentId)
-    .single();
-
-  if (fetchError) {
-    console.error("Error fetching document:", fetchError);
-    throw fetchError;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message);
   }
 
-  // Actualizar el documento
-  const { data, error } = await supabase
-    .from("documents")
-    .update(updates)
-    .eq("id", documentId);
-
-  if (error) {
-    console.error("Error updating document:", error);
-    throw error;
-  }
-
-  // Log opcional para saber si cambió `is_public`
-  if (currentDocument?.is_public !== updates.is_public) {
-    console.log(
-      "Document visibility updated. Collaborators will be managed by the trigger."
-    );
-  }
-
-  return data;
+  return response.json();
 }
 
 export async function deleteDocument(documentId: string): Promise<void> {
-  const { error } = await supabase
-    .from("documents")
-    .delete()
-    .eq("id", documentId);
+  const url = API_ROUTES.DOCUMENTS.DELETE.replace(":id", documentId);
+  const response = await fetch(url, {
+    method: "DELETE",
+  });
 
-  if (error) {
-    console.error("Error deleting document:", error);
-    throw error;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message);
   }
 }
 
@@ -83,21 +56,17 @@ export async function joinPublicDocument(
   userId: string,
   permission: "read" | "write" = "read"
 ) {
-  // Agregar al usuario como colaborador
-  const { data, error } = await supabase
-    .from("collaborators")
-    .insert({
-      document_id: documentId,
-      user_id: userId,
-      permission_level: permission,
-    })
-    .select()
-    .single();
+  const url = API_ROUTES.DOCUMENTS.JOIN.replace(":id", documentId);
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, permission }),
+  });
 
-  if (error) {
-    console.error("Error joining public document:", error);
-    throw error;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message);
   }
 
-  return data;
+  return response.json();
 }

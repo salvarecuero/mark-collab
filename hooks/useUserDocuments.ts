@@ -1,14 +1,15 @@
 "use client";
 
-import { createClient } from "@/utils/supabase/client";
-import { useEffect, useState } from "react";
+import { API_ROUTES } from "@/constants/routes";
 import { Document } from "@/types/document";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 export function useUserDocuments(userId: string) {
+  const supabase = createClient();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
     if (!userId) return;
@@ -16,13 +17,16 @@ export function useUserDocuments(userId: string) {
     async function loadDocuments() {
       try {
         setLoading(true);
+        const response = await fetch(
+          `${API_ROUTES.USER.DOCUMENTS}?userId=${userId}`
+        );
 
-        const { data, error } = await supabase.rpc("get_user_documents", {
-          current_user_id: userId,
-        });
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message);
+        }
 
-        if (error) throw error;
-
+        const data = await response.json();
         setDocuments(data || []);
       } catch (err) {
         setError(err as Error);

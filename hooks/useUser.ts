@@ -1,16 +1,24 @@
-import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { API_ROUTES } from "@/constants/routes";
 import { UserMetadata } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
 
 export const useUser = () => {
   const [user, setUser] = useState<UserMetadata | null>(null);
 
   useEffect(() => {
-    const supabase = createClient();
+    async function fetchUser() {
+      const response = await fetch(API_ROUTES.USER.CURRENT);
 
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-    });
+      if (!response.ok) {
+        setUser(null);
+        return;
+      }
+
+      const data = await response.json();
+      setUser(data);
+    }
+
+    fetchUser();
   }, []);
 
   return user;

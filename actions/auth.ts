@@ -1,16 +1,13 @@
 "use server";
 
+import { API_ROUTES } from "@/constants/routes";
 import { encodedRedirect } from "@/utils/utils";
-import { createClient } from "@/utils/supabase/server";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const fullName = formData.get("fullName")?.toString();
-  const supabase = await createClient();
-  const origin = (await headers()).get("origin");
 
   if (!email || !password) {
     return encodedRedirect(
@@ -20,55 +17,35 @@ export const signUpAction = async (formData: FormData) => {
     );
   }
 
-  const {
-    error: authError,
-    data: { user },
-  } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
+  const response = await fetch(API_ROUTES.AUTH.SIGN_UP, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, fullName }),
   });
 
-  if (authError) {
-    console.error(authError.code + " " + authError.message);
-    return encodedRedirect("error", "/auth/sign-up", authError.message);
+  const data = await response.json();
+
+  if (!response.ok) {
+    return encodedRedirect("error", "/auth/sign-up", data.error);
   }
 
-  const { error: dbError } = await supabase.from("profiles").insert({
-    id: user?.id,
-    full_name: fullName,
-    username: "Salvatore",
-    image: null,
-  });
-
-  if (dbError) {
-    console.error(dbError.code + " " + dbError.message);
-
-    await supabase.auth.admin.deleteUser(user?.id || "");
-    return encodedRedirect("error", "/auth/sign-up", dbError.message);
-  }
-
-  return encodedRedirect(
-    "success",
-    "/auth/sign-up",
-    "Thanks for signing up! Please check your email for a verification link."
-  );
+  return encodedRedirect("success", "/auth/sign-up", data.message);
 };
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
+  const response = await fetch(API_ROUTES.AUTH.SIGN_IN, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
   });
 
-  if (error) {
-    return encodedRedirect("error", "/auth/sign-in", error.message);
+  const data = await response.json();
+
+  if (!response.ok) {
+    return encodedRedirect("error", "/auth/sign-in", data.error);
   }
 
   return redirect("/dashboard");
@@ -76,8 +53,6 @@ export const signInAction = async (formData: FormData) => {
 
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
-  const supabase = await createClient();
-  const origin = (await headers()).get("origin");
   const callbackUrl = formData.get("callbackUrl")?.toString();
 
   if (!email) {
@@ -88,17 +63,16 @@ export const forgotPasswordAction = async (formData: FormData) => {
     );
   }
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?redirect_to=/user/reset-password`,
+  const response = await fetch(API_ROUTES.AUTH.FORGOT_PASSWORD, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
   });
 
-  if (error) {
-    console.error(error.message);
-    return encodedRedirect(
-      "error",
-      "/auth/forgot-password",
-      "Could not reset password"
-    );
+  const data = await response.json();
+
+  if (!response.ok) {
+    return encodedRedirect("error", "/auth/forgot-password", data.error);
   }
 
   if (callbackUrl) {
@@ -113,13 +87,11 @@ export const forgotPasswordAction = async (formData: FormData) => {
 };
 
 export const resetPasswordAction = async (formData: FormData) => {
-  const supabase = await createClient();
-
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
   if (!password || !confirmPassword) {
-    encodedRedirect(
+    return encodedRedirect(
       "error",
       "/user/reset-password",
       "Password and confirm password are required"
@@ -127,22 +99,29 @@ export const resetPasswordAction = async (formData: FormData) => {
   }
 
   if (password !== confirmPassword) {
-    encodedRedirect("error", "/user/reset-password", "Passwords do not match");
+    return encodedRedirect(
+      "error",
+      "/user/reset-password",
+      "Passwords do not match"
+    );
   }
 
-  const { error } = await supabase.auth.updateUser({
-    password: password,
+  const response = await fetch(API_ROUTES.AUTH.RESET_PASSWORD, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
   });
 
-  if (error) {
-    encodedRedirect("error", "/user/reset-password", "Password update failed");
+  const data = await response.json();
+
+  if (!response.ok) {
+    return encodedRedirect("error", "/user/reset-password", data.error);
   }
 
-  encodedRedirect("success", "/user/reset-password", "Password updated");
+  return encodedRedirect("success", "/user/reset-password", "Password updated");
 };
 
 export const signOutAction = async () => {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  await fetch(API_ROUTES.AUTH.SIGN_OUT, { method: "POST" });
   return redirect("/");
 };

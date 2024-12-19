@@ -14,7 +14,7 @@ export default function Dashboard() {
   const handleCreateDocument = async () => {
     const document = await createDocument("Untitled", "", user?.id || "");
 
-    router.push(`/document/${document.id}`);
+    if (document.id) router.push(`/document/${document.id}`);
   };
 
   return (
