@@ -1,16 +1,20 @@
+import { Document } from "@/types/document";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
 type Params = Promise<{ id: string }>;
 
 export async function PUT(request: Request, segmentData: { params: Params }) {
-  const { title, content, is_public } = await request.json();
+  const updates: Partial<Document> = await request.json();
   const { id: documentId } = await segmentData.params;
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("documents")
-    .update({ title, content, is_public })
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", documentId)
     .select();
 

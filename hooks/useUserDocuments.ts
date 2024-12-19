@@ -56,6 +56,7 @@ export function useUserDocuments(userId: string) {
               const updatedList = prev.filter(
                 (doc) => doc.id !== (newDoc as Document).id
               );
+
               return [newDoc as Document, ...updatedList];
             });
           } else if (eventType === "DELETE") {

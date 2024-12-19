@@ -18,15 +18,22 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
+    <div className="flex items-center justify-center h-full">
       {loading ? (
         "Loading..."
       ) : (
-        <>
-          <h1>Dashboard</h1>
-          <button onClick={handleCreateDocument}>Create Document</button>
+        <div className="flex flex-col gap-y-5 min-h-fit h-2/3 text-center">
+          <h1 className="text-2xl font-bold">Your projects!</h1>
+
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+            onClick={handleCreateDocument}
+          >
+            Create Document
+          </button>
+
           <DocumentList documents={documents} />
-        </>
+        </div>
       )}
     </div>
   );
