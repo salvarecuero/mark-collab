@@ -1,0 +1,71 @@
+.markdown-viewer {
+  @apply prose prose-lg max-w-none;
+}
+
+.markdown-viewer h1 {
+  @apply text-4xl font-bold mt-6 mb-4 text-gray-900;
+}
+
+.markdown-viewer h2 {
+  @apply text-3xl font-semibold mt-5 mb-3 text-gray-800;
+}
+
+.markdown-viewer h3 {
+  @apply text-2xl font-medium mt-4 mb-2 text-gray-700;
+}
+
+.markdown-viewer p {
+  @apply text-base leading-relaxed text-gray-600 mt-2 mb-4;
+}
+
+.markdown-viewer a {
+  @apply text-blue-500 underline hover:text-blue-700;
+}
+
+.markdown-viewer ul {
+  @apply list-disc list-inside mt-2 mb-4 pl-5 text-gray-600;
+}
+
+.markdown-viewer ol {
+  @apply list-decimal list-inside mt-2 mb-4 pl-5 text-gray-600;
+}
+
+.markdown-viewer li {
+  @apply mb-1;
+}
+
+.markdown-viewer table {
+  @apply table-auto border-collapse border border-gray-300 w-full text-left mt-4 mb-4;
+}
+
+.markdown-viewer th {
+  @apply border border-gray-300 bg-gray-100 px-4 py-2 font-semibold text-gray-700;
+}
+
+.markdown-viewer td {
+  @apply border border-gray-300 px-4 py-2 text-gray-600;
+}
+
+.markdown-viewer thead {
+  @apply bg-gray-200;
+}
+
+.markdown-viewer tbody tr:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.markdown-viewer blockquote {
+  @apply border-l-4 border-gray-400 bg-gray-100 px-4 py-2 italic text-gray-700 my-4;
+}
+
+.markdown-viewer code {
+  @apply bg-gray-200 text-red-600 px-1 rounded font-mono text-sm;
+}
+
+.markdown-viewer pre {
+  @apply bg-gray-900 text-white p-4 rounded overflow-x-auto mt-4 mb-4;
+}
+
+.markdown-viewer hr {
+  @apply border-gray-300 my-6;
+}
