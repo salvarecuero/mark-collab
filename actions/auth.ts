@@ -1,4 +1,4 @@
-"use server";
+"use client";
 
 import { API_ROUTES } from "@/constants/routes";
 import { encodedRedirect } from "@/utils/utils";

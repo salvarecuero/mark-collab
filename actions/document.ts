@@ -1,3 +1,5 @@
+"use client";
+
 import { API_ROUTES } from "@/constants/routes";
 import { Document } from "@/types/document";
 
