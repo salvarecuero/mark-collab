@@ -22,13 +22,13 @@ export async function createDocument(
 
 export async function updateDocument(
   documentId: string,
-  updates: Partial<{ title: string; content: string; is_public: boolean }>
+  updates: Partial<Document>
 ) {
   const url = API_ROUTES.DOCUMENTS.UPDATE.replace(":id", documentId);
   const response = await fetch(url, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updates),
+    body: JSON.stringify({ ...updates, updated_at: new Date().toISOString() }),
   });
 
   if (!response.ok) {
