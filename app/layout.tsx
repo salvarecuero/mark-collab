@@ -1,5 +1,7 @@
 import "./globals.css";
 import { Patua_One, Gowun_Dodum } from "next/font/google";
+import { Metadata } from "next";
+import { defaultMetadata } from "@/lib/metadata";
 
 const patua = Patua_One({
   weight: "400",
@@ -15,15 +17,7 @@ const gowun = Gowun_Dodum({
   display: "swap",
 });
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
-
-export const metadata = {
-  metadataBase: new URL(defaultUrl),
-  title: "Mark Collab",
-  description: "Mark Collab is a collaborative markdown editor",
-};
+export const metadata: Metadata = defaultMetadata;
 
 export default function RootLayout({
   children,

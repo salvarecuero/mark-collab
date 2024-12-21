@@ -1,3 +1,5 @@
+import { Metadata } from "next";
+import { defaultMetadata } from "@/lib/metadata";
 import Header from "@/components/Header";
 import "../globals.css";
 import IbelickBackground from "@/components/IbelickBackground";
@@ -6,10 +8,15 @@ const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
-export const metadata = {
-  metadataBase: new URL(defaultUrl),
-  title: "Mark-Collab",
-  description: "Mark Collab is a collaborative markdown editor",
+export const metadata: Metadata = {
+  ...defaultMetadata,
+  title: "Dashboard | Mark-Collab",
+  description: "Manage your markdown documents and collaborations",
+  openGraph: {
+    ...defaultMetadata.openGraph,
+    title: "Dashboard | Mark-Collab",
+    description: "Manage your markdown documents and collaborations",
+  },
 };
 
 export default function RootLayout({

@@ -1,5 +1,12 @@
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from "next";
+import { defaultMetadata } from "@/lib/metadata";
+
+export const metadata: Metadata = {
+  ...defaultMetadata,
+  robots: "noindex, nofollow",
+};
 
 export default async function Layout({
   children,

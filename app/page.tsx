@@ -2,7 +2,6 @@ import IbelickBackground from "@/components/IbelickBackground";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
-import { signOutAction } from "@/actions/auth";
 import SignOutButton from "@/components/SignOutButton";
 
 export default async function Index() {
