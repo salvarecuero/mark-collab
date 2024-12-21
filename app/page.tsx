@@ -16,8 +16,8 @@ export default async function Index() {
 
       {user && <SignOutButton className="absolute top-10 right-10" />}
 
-      <h1 className="text-8xl font-bold font-patua">Mark-Collab</h1>
-      <p className="text-2xl">
+      <h1 className="text-8xl font-bold font-patua text-center">Mark-Collab</h1>
+      <p className="text-2xl text-center">
         A platform for creating and collaborating on markdowns
       </p>
 

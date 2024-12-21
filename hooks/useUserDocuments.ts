@@ -37,7 +37,6 @@ export function useUserDocuments(userId: string) {
 
     loadDocuments();
 
-    // Suscripción a cambios en tiempo real
     const documentsChannel = supabase
       .channel("documents")
       .on(
@@ -47,12 +46,9 @@ export function useUserDocuments(userId: string) {
           const { eventType, new: newDoc, old: oldDoc } = payload;
 
           if (eventType === "INSERT") {
-            // Insertar el nuevo documento al inicio de la lista
             setDocuments((prev) => [newDoc as Document, ...prev]);
           } else if (eventType === "UPDATE") {
-            // Mover el documento actualizado al inicio de la lista
             setDocuments((prev) => {
-              // Filtra el documento actualizado y agrega la versión nueva al inicio
               const updatedList = prev.filter(
                 (doc) => doc.id !== (newDoc as Document).id
               );
@@ -60,7 +56,6 @@ export function useUserDocuments(userId: string) {
               return [newDoc as Document, ...updatedList];
             });
           } else if (eventType === "DELETE") {
-            // Eliminar el documento de la lista
             setDocuments((prev) =>
               prev.filter((doc) => doc.id !== (oldDoc as any).id)
             );
@@ -102,7 +97,6 @@ export function useUserDocuments(userId: string) {
       )
       .subscribe();
 
-    // Cleanup de la suscripción
     return () => {
       supabase.removeChannel(documentsChannel);
       supabase.removeChannel(collaboratorsChannel);

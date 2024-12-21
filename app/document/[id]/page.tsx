@@ -17,14 +17,17 @@ export default function Page() {
 
   return (
     <div className="flex flex-col h-screen">
-      <Header className="p-5 bg-slate-100" logoClassName="text-black">
+      <Header
+        className="p-5 bg-slate-100 sticky top-0"
+        logoClassName="text-black"
+      >
         <EditorHeaderSection
           hasChangesSinceLastSave={hasChangesSinceLastSave}
           isSaving={isSaving}
         />
       </Header>
 
-      <div className="flex h-full">
+      <div className="flex h-[calc(100vh-80px)]">
         <textarea
           className="w-1/2 h-full text-2xl rounded-md p-4 outline-none bg-[#1b1b1f] resize-none text-white font-medium"
           value={localContent}
@@ -34,7 +37,7 @@ export default function Page() {
           autoFocus={true}
         />
 
-        <div className="flex flex-1 h-full border-l border-gray-300 bg-[#161618] p-4 text-white">
+        <div className="w-1/2 border-l border-gray-300 bg-[#161618] text-white overflow-y-auto">
           <Markdown className="markdown-viewer" remarkPlugins={[remarkGfm]}>
             {localContent}
           </Markdown>

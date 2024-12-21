@@ -23,7 +23,7 @@ export default function Dashboard() {
       {loading ? (
         <Spinner />
       ) : (
-        <div className="flex flex-col gap-y-5 min-h-fit h-2/3 text-center">
+        <div className="flex flex-col gap-y-5 min-h-fit h-2/3 text-center max-w-full px-5">
           <h1 className="text-4xl font-bold">Your projects</h1>
 
           <button

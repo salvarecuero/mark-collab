@@ -13,20 +13,21 @@ const Header = ({
   logoClassName?: string;
 }) => {
   return (
-    <header
-      className={cn(
-        "flex justify-between items-center p-10 relative",
-        className
-      )}
-    >
-      <Link href="/dashboard">
-        <Logo className={cn("text-4xl", logoClassName)} />
-      </Link>
+    <header className={cn("flex flex-col gap-y-1 p-10", className)}>
+      <div className="flex items-center gap-x-2 justify-between">
+        <Link href="/dashboard">
+          <Logo className={cn("text-4xl", logoClassName)} />
+        </Link>
 
-      <div className="flex items-center">{children}</div>
+        <div className="items-center hidden md:flex">{children}</div>
 
-      <div className="flex items-center gap-2">
-        <SignOutButton />
+        <div className="flex items-center gap-2">
+          <SignOutButton />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center md:hidden">
+        {children}
       </div>
     </header>
   );

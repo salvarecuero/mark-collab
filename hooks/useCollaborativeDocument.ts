@@ -49,7 +49,6 @@ export function useCollaborativeDocument(documentId: string) {
   };
 
   useEffect(() => {
-    console.log(messages.length, messages);
     if (
       messages.length === 0 ||
       messages[messages.length - 1].session_id === sessionId.current

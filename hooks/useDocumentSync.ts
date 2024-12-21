@@ -20,7 +20,6 @@ export function useDocumentSync(documentId: string) {
   useEffect(() => {
     if (!documentId) return;
 
-    // Fetch inicial del documento
     const fetchDocument = async () => {
       const { data, error } = await supabase
         .from("documents")
@@ -37,7 +36,6 @@ export function useDocumentSync(documentId: string) {
 
     fetchDocument();
 
-    // Suscripción a cambios en tiempo real
     const documentChannel = supabase
       .channel(`document-${documentId}`)
       .on(
@@ -53,14 +51,14 @@ export function useDocumentSync(documentId: string) {
 
           setDocument((prev) => ({
             ...prev!,
-            content: updatedContent, // Actualiza el contenido local
+            content: updatedContent,
           }));
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(documentChannel); // Cleanup al desmontar
+      supabase.removeChannel(documentChannel);
     };
   }, [documentId]);
 

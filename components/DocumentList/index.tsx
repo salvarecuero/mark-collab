@@ -10,7 +10,7 @@ const DocumentList = ({ documents }: { documents: Document[] }) => {
   };
 
   return (
-    <ul className="flex flex-col gap-y-2 w-[560px] relative">
+    <ul className="flex flex-col gap-y-2 w-[560px] max-w-full relative">
       {documents.map((document) => (
         <DocumentListItem
           key={document.id}

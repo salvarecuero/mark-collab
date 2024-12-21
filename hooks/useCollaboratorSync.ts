@@ -9,7 +9,6 @@ export function useCollaboratorSync(documentId: string) {
   useEffect(() => {
     if (!documentId) return;
 
-    // Fetch inicial de colaboradores
     const fetchCollaborators = async () => {
       const { data, error } = await supabase
         .from("collaborators")
@@ -22,7 +21,6 @@ export function useCollaboratorSync(documentId: string) {
 
     fetchCollaborators();
 
-    // Suscripción a cambios en colaboradores
     const collaboratorChannel = supabase
       .channel("collaborator-updates")
       .on(
