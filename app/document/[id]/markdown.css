@@ -1,71 +1,147 @@
 .markdown-viewer {
   @apply prose prose-lg max-w-none;
+  background-color: #161618;
+  color: #e4e4e7;
 }
 
 .markdown-viewer h1 {
-  @apply text-4xl font-bold mt-6 mb-4 text-gray-900;
+  @apply text-4xl font-bold mt-6 mb-4 text-white;
 }
 
 .markdown-viewer h2 {
-  @apply text-3xl font-semibold mt-5 mb-3 text-gray-800;
+  @apply text-3xl font-semibold mt-5 mb-3 text-gray-200;
 }
 
 .markdown-viewer h3 {
-  @apply text-2xl font-medium mt-4 mb-2 text-gray-700;
+  @apply text-2xl font-medium mt-4 mb-2 text-gray-300;
+}
+
+.markdown-viewer h4 {
+  @apply text-xl font-medium mt-3 mb-2 text-gray-300;
+}
+
+.markdown-viewer h5 {
+  @apply text-lg font-medium mt-2 mb-2 text-gray-400;
+}
+
+.markdown-viewer h6 {
+  @apply text-base font-medium mt-2 mb-2 text-gray-500;
 }
 
 .markdown-viewer p {
-  @apply text-base leading-relaxed text-gray-600 mt-2 mb-4;
+  @apply text-base leading-relaxed text-gray-400 mt-2 mb-4;
 }
 
 .markdown-viewer a {
-  @apply text-blue-500 underline hover:text-blue-700;
+  @apply text-blue-400 underline hover:text-blue-300;
 }
 
 .markdown-viewer ul {
-  @apply list-disc list-inside mt-2 mb-4 pl-5 text-gray-600;
+  @apply list-disc list-inside mt-2 mb-4 pl-5 text-gray-400;
 }
 
 .markdown-viewer ol {
-  @apply list-decimal list-inside mt-2 mb-4 pl-5 text-gray-600;
+  @apply list-decimal list-inside mt-2 mb-4 pl-5 text-gray-400;
 }
 
 .markdown-viewer li {
   @apply mb-1;
 }
 
-.markdown-viewer table {
-  @apply table-auto border-collapse border border-gray-300 w-full text-left mt-4 mb-4;
-}
-
-.markdown-viewer th {
-  @apply border border-gray-300 bg-gray-100 px-4 py-2 font-semibold text-gray-700;
-}
-
-.markdown-viewer td {
-  @apply border border-gray-300 px-4 py-2 text-gray-600;
-}
-
-.markdown-viewer thead {
-  @apply bg-gray-200;
-}
-
-.markdown-viewer tbody tr:nth-child(even) {
-  @apply bg-gray-50;
-}
-
 .markdown-viewer blockquote {
-  @apply border-l-4 border-gray-400 bg-gray-100 px-4 py-2 italic text-gray-700 my-4;
+  @apply border-l-4 border-gray-600 bg-gray-800 px-4 py-2 italic text-gray-400 my-4;
 }
 
 .markdown-viewer code {
-  @apply bg-gray-200 text-red-600 px-1 rounded font-mono text-sm;
+  @apply bg-gray-700 text-yellow-300 px-1 rounded font-mono text-sm;
 }
 
 .markdown-viewer pre {
-  @apply bg-gray-900 text-white p-4 rounded overflow-x-auto mt-4 mb-4;
+  @apply bg-gray-800 text-gray-200 p-4 rounded overflow-x-auto mt-4 mb-4;
+  font-family: "Fira Code", monospace;
+}
+
+.markdown-viewer table {
+  @apply table-auto border-collapse border border-gray-600 w-full text-left mt-4 mb-4;
+}
+
+.markdown-viewer th {
+  @apply border border-gray-500 bg-gray-700 px-4 py-2 font-semibold text-white;
+}
+
+.markdown-viewer td {
+  @apply border border-gray-500 px-4 py-2 text-gray-300;
+}
+
+.markdown-viewer thead {
+  @apply bg-gray-700;
+}
+
+.markdown-viewer tbody tr:nth-child(even) {
+  @apply bg-gray-800;
+}
+
+.markdown-viewer tbody tr:nth-child(odd) {
+  @apply bg-gray-900;
 }
 
 .markdown-viewer hr {
-  @apply border-gray-300 my-6;
+  @apply border-gray-600 my-6;
+}
+
+.markdown-viewer del {
+  @apply text-gray-500 line-through;
+}
+
+.markdown-viewer strong {
+  @apply font-bold text-gray-200;
+}
+
+.markdown-viewer em {
+  @apply italic text-gray-300;
+}
+
+.markdown-viewer img {
+  @apply max-w-full h-auto mt-4 mb-4 rounded;
+}
+
+.markdown-viewer details {
+  @apply bg-gray-800 text-gray-300 p-3 rounded my-4;
+}
+
+.markdown-viewer details summary {
+  @apply cursor-pointer font-semibold;
+}
+
+.markdown-viewer details[open] {
+  @apply bg-gray-700;
+}
+
+/* Estilo para Emojis */
+.markdown-viewer emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    sans-serif;
+  font-size: 1em;
+  vertical-align: middle;
+}
+
+/* Estilo para listas anidadas */
+.markdown-viewer ul ul,
+.markdown-viewer ol ol {
+  @apply mt-1 mb-1 pl-6;
+}
+
+.markdown-viewer ul li,
+.markdown-viewer ol li {
+  @apply text-gray-400;
+}
+
+/* Estilo para separadores */
+.markdown-viewer hr {
+  @apply border-t-2 border-gray-700 mt-6 mb-6;
+}
+
+/* Estilo para subrayado */
+.markdown-viewer u {
+  @apply underline text-gray-300;
 }

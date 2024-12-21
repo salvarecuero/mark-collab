@@ -26,7 +26,7 @@ export default function Page() {
 
       <div className="flex h-full">
         <textarea
-          className="w-1/2 h-full text-2xl rounded-md py-2 px-4 outline-none bg-slate-200 resize-none"
+          className="w-1/2 h-full text-2xl rounded-md p-4 outline-none bg-[#1b1b1f] resize-none text-white font-medium"
           value={localContent}
           onChange={(e) => handleLocalChange(e.target.value)}
           placeholder="Write your markdown here..."
@@ -34,7 +34,7 @@ export default function Page() {
           autoFocus={true}
         />
 
-        <div className="flex flex-1 h-full border-l border-gray-300 py-2 px-4 bg-slate-300">
+        <div className="flex flex-1 h-full border-l border-gray-300 bg-[#161618] p-4 text-white">
           <Markdown className="markdown-viewer" remarkPlugins={[remarkGfm]}>
             {localContent}
           </Markdown>
