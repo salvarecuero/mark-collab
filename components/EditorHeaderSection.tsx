@@ -6,9 +6,9 @@ const EditorHeaderSection = ({
   isSaving: boolean;
 }) => {
   return (
-    <div className="flex gap-x-5 items-center p-2 bg-gray-100">
+    <div className="flex gap-x-5 items-center p-2 mx-auto">
       <span
-        className={`text-gray-500 font-bold ${hasChangesSinceLastSave || isSaving ? "italic" : ""}`}
+        className={`font-bold ${hasChangesSinceLastSave || isSaving ? "italic" : ""}`}
       >
         {hasChangesSinceLastSave
           ? "Unsaved changes"

@@ -19,14 +19,19 @@ export const DocumentTitle = ({
     return (
       <input
         value={newTitle}
+        size={newTitle.length}
         onChange={(e) => onTitleChange(e.target.value)}
-        className="border p-1 rounded max-w-full"
+        className="bg-transparent text-inherit font-inherit p-0 m-0 border-none outline-none max-w-full text-center"
+        autoFocus={true}
       />
     );
   }
 
   return (
-    <Link className="max-w-full truncate" href={`/document/${documentId}`}>
+    <Link
+      className="flex flex-1 justify-center truncate"
+      href={`/document/${documentId}`}
+    >
       {title}
     </Link>
   );

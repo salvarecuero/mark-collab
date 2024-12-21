@@ -44,8 +44,12 @@ export const signInAction = async (formData: FormData) => {
 
   const data = await response.json();
 
-  if (!response.ok) {
-    return encodedRedirect("error", "/auth/sign-in", data.error);
+  if (data.status >= 400) {
+    return encodedRedirect(
+      "error",
+      "/auth/sign-in",
+      data.code === "invalid_credentials" ? "Invalid credentials" : data.error
+    );
   }
 
   return redirect("/dashboard");

@@ -48,10 +48,6 @@ export const updateSession = async (request: NextRequest) => {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
-    if (request.nextUrl.pathname === "/" && !user.error) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
     if (user.data.user?.id) response.cookies.set("user-id", user.data.user.id);
 
     return response;

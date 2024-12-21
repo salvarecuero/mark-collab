@@ -7,7 +7,7 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="bg-black flex flex-col items-center justify-center h-screen">
+    <main className="bg-black flex flex-col items-center justify-center h-screen text-white">
       <Link
         className="bg-white min-w-64 p-2 rounded-md flex items-center justify-center"
         href="/"

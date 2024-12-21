@@ -58,6 +58,10 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        patua: "var(--font-patua)",
+        gowun: "var(--font-gowun)",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
