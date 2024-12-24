@@ -11,6 +11,11 @@ export const API_ROUTES = {
     UPDATE: "/api/documents/:id",
     DELETE: "/api/documents/:id",
     JOIN: "/api/documents/:id/join",
+    COLLABORATORS: {
+      LIST: "/api/documents/:id/collaborators",
+      ADD: "/api/documents/:id/collaborators",
+      REMOVE: "/api/documents/:id/collaborators/:collaboratorId",
+    },
   },
   USER: {
     DOCUMENTS: "/api/user/documents",

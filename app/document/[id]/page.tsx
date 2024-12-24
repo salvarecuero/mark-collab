@@ -7,6 +7,7 @@ import "./markdown.css";
 import remarkGfm from "remark-gfm";
 import Header from "@/components/Header";
 import EditorHeaderSection from "@/components/EditorHeaderSection";
+import { useCollaboratorSync } from "@/hooks/useCollaboratorSync";
 
 export default function Page() {
   const params = useParams();
@@ -14,16 +15,19 @@ export default function Page() {
 
   const { localContent, handleLocalChange, isSaving, hasChangesSinceLastSave } =
     useCollaborativeDocument(id);
+  const { collaborators } = useCollaboratorSync(id);
 
   return (
     <div className="flex flex-col h-screen">
       <Header
-        className="p-5 bg-slate-100 sticky top-0"
+        className="p-3 bg-slate-100 sticky top-0"
         logoClassName="text-black"
       >
         <EditorHeaderSection
           hasChangesSinceLastSave={hasChangesSinceLastSave}
           isSaving={isSaving}
+          documentId={id}
+          collaborators={collaborators}
         />
       </Header>
 

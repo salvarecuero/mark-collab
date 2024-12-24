@@ -33,8 +33,6 @@ export async function POST(request: Request) {
   const { error: dbError } = await supabase.from("profiles").insert({
     id: user?.id,
     full_name: fullName,
-    username: "Salvatore",
-    image: null,
   });
 
   if (dbError) {

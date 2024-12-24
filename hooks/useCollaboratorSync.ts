@@ -1,22 +1,31 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Collaborator } from "@/types/collaborator";
+import { API_ROUTES } from "@/constants/routes";
 
 export function useCollaboratorSync(documentId: string) {
   const supabase = createClient();
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!documentId) return;
 
     const fetchCollaborators = async () => {
-      const { data, error } = await supabase
-        .from("collaborators")
-        .select("*")
-        .eq("document_id", documentId);
-
-      if (error) console.error("Error fetching collaborators:", error);
-      setCollaborators(data || []);
+      const url = API_ROUTES.DOCUMENTS.COLLABORATORS.LIST.replace(
+        ":id",
+        documentId
+      );
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch collaborators");
+        const data = await response.json();
+        setCollaborators(data);
+      } catch (error) {
+        console.error("Error fetching collaborators:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchCollaborators();
@@ -31,22 +40,9 @@ export function useCollaboratorSync(documentId: string) {
           table: "collaborators",
           filter: `document_id=eq.${documentId}`,
         },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            setCollaborators((prev) => [...prev, payload.new as Collaborator]);
-          } else if (payload.eventType === "DELETE") {
-            setCollaborators((prev) =>
-              prev.filter((collab) => collab.id !== payload.old.id)
-            );
-          } else if (payload.eventType === "UPDATE") {
-            setCollaborators((prev) =>
-              prev.map((collab) =>
-                collab.id === payload.new.id
-                  ? (payload.new as Collaborator)
-                  : collab
-              )
-            );
-          }
+        async () => {
+          // Refetch collaborators when any change occurs
+          await fetchCollaborators();
         }
       )
       .subscribe();
@@ -56,5 +52,5 @@ export function useCollaboratorSync(documentId: string) {
     };
   }, [documentId]);
 
-  return { collaborators, setCollaborators };
+  return { collaborators, loading };
 }

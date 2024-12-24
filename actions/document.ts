@@ -53,23 +53,3 @@ export async function deleteDocument(documentId: string): Promise<void> {
     throw new Error(error.message);
   }
 }
-
-export async function joinPublicDocument(
-  documentId: string,
-  userId: string,
-  permission: "read" | "write" = "read"
-) {
-  const url = API_ROUTES.DOCUMENTS.JOIN.replace(":id", documentId);
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId, permission }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message);
-  }
-
-  return response.json();
-}
