@@ -38,7 +38,7 @@ export function useUserDocuments(userId: string) {
     loadDocuments();
 
     const documentsChannel = supabase
-      .channel("documents")
+      .channel(`documents-${userId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "documents" },
@@ -65,7 +65,7 @@ export function useUserDocuments(userId: string) {
       .subscribe();
 
     const collaboratorsChannel = supabase
-      .channel("collaborators")
+      .channel(`collaborators-${userId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "collaborators" },

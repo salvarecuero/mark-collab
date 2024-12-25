@@ -45,10 +45,11 @@ export async function removeCollaborator(
   const url = API_ROUTES.DOCUMENTS.COLLABORATORS.REMOVE.replace(
     ":id",
     documentId
-  ).replace(":collaboratorId", collaboratorId);
+  );
 
   const response = await fetch(url, {
     method: "DELETE",
+    body: JSON.stringify({ collaboratorId }),
   });
 
   if (!response.ok) {

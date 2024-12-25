@@ -1,9 +1,9 @@
 import { API_ROUTES } from "@/constants/routes";
-import { UserMetadata } from "@supabase/supabase-js";
+import { Profile } from "@/types/profile";
 import { useEffect, useState } from "react";
 
 export const useUser = () => {
-  const [user, setUser] = useState<UserMetadata | null>(null);
+  const [user, setUser] = useState<Profile | null>(null);
 
   useEffect(() => {
     async function fetchUser() {

@@ -44,10 +44,10 @@ export const AddCollaboratorInput = ({
     return (
       <button
         onClick={() => setIsEditing(true)}
-        className="p-1 hover:bg-black rounded-full transition-colors hover:text-white"
+        className="p-1 bg-white text-black rounded-full transition-colors flex justify-center items-center"
         title="Add collaborator"
       >
-        <Plus size={16} />
+        <Plus size={24} strokeWidth={3} />
       </button>
     );
   }
@@ -58,7 +58,7 @@ export const AddCollaboratorInput = ({
         type="email"
         name="email"
         placeholder="Enter email..."
-        className="bg-transparent border-b border-white/20 outline-none px-1 text-sm"
+        className="bg-transparent border-b border-white/20 outline-none px-1 text-sm w-full"
         autoFocus
         disabled={isLoading}
         required

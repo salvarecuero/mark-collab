@@ -3,14 +3,25 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const supabase = await createClient();
+
   const {
     data: { user },
-    error,
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (error || !user) {
+  if (authError || !user) {
     return NextResponse.json(null);
   }
 
-  return NextResponse.json(user);
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError) {
+    return NextResponse.json(null);
+  }
+
+  return NextResponse.json(profile);
 }

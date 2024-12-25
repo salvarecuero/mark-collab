@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
 import { createClient } from "@/utils/supabase/client";
 import { useThrottledCallback } from "./useThrottledCallback";
 import { useUser } from "./useUser";
+import { useCollaborators } from "./useCollaborators";
 
 export function useCollaborativeDocument(documentId: string) {
   const supabase = createClient();
@@ -11,7 +12,18 @@ export function useCollaborativeDocument(documentId: string) {
   const sessionId = useRef(crypto.randomUUID());
 
   const { messages, sendMessage } = useRealtimeChannel(channelName);
+  const { collaborators } = useCollaborators(documentId);
+
   const user = useUser();
+  const userIsAuthor = useMemo(() => {
+    if (!user) return false;
+    return (
+      collaborators.find((collaborator) => collaborator.user_id === user?.id)
+        ?.permission_level === "author"
+    );
+  }, [collaborators, user?.id]);
+
+  const chatMessages = messages.filter((message) => message.type === "chat");
 
   const [localContent, setLocalContent] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
@@ -34,8 +46,9 @@ export function useCollaborativeDocument(documentId: string) {
         type: "edit",
         content,
         timestamp: new Date().toISOString(),
-        user_id: user?.id,
+        user_id: user?.id ?? "",
         session_id: sessionId.current,
+        user_name: user?.full_name ?? "",
       });
     },
     500,
@@ -48,6 +61,20 @@ export function useCollaborativeDocument(documentId: string) {
     throttledSendUpdate(newContent);
   };
 
+  const handleChatMessage = useCallback(
+    (newMessage: string) => {
+      sendMessage({
+        type: "chat",
+        content: newMessage,
+        timestamp: new Date().toISOString(),
+        user_id: user?.id ?? "",
+        session_id: sessionId.current,
+        user_name: user?.full_name ?? "",
+      });
+    },
+    [sendMessage, user?.id, sessionId.current, user?.full_name]
+  );
+
   useEffect(() => {
     if (
       messages.length === 0 ||
@@ -55,7 +82,8 @@ export function useCollaborativeDocument(documentId: string) {
     )
       return;
 
-    setLocalContent(messages[messages.length - 1].content);
+    if (messages[messages.length - 1].type === "edit")
+      setLocalContent(messages[messages.length - 1].content);
   }, [messages.length]);
 
   useEffect(() => {
@@ -92,5 +120,9 @@ export function useCollaborativeDocument(documentId: string) {
     saveToDatabase,
     isSaving,
     hasChangesSinceLastSave: hasChangesSinceLastSave.current,
+    handleChatMessage,
+    chatMessages,
+    collaborators,
+    userIsAuthor,
   };
 }

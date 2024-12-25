@@ -14,7 +14,7 @@ export const API_ROUTES = {
     COLLABORATORS: {
       LIST: "/api/documents/:id/collaborators",
       ADD: "/api/documents/:id/collaborators",
-      REMOVE: "/api/documents/:id/collaborators/:collaboratorId",
+      REMOVE: "/api/documents/:id/collaborators",
     },
   },
   USER: {

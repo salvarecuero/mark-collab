@@ -3,14 +3,12 @@ import { createClient } from "@/utils/supabase/client";
 import { Collaborator } from "@/types/collaborator";
 import { API_ROUTES } from "@/constants/routes";
 
-export function useCollaboratorSync(documentId: string) {
+export const useCollaborators = (documentId: string) => {
   const supabase = createClient();
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!documentId) return;
-
     const fetchCollaborators = async () => {
       const url = API_ROUTES.DOCUMENTS.COLLABORATORS.LIST.replace(
         ":id",
@@ -30,8 +28,9 @@ export function useCollaboratorSync(documentId: string) {
 
     fetchCollaborators();
 
-    const collaboratorChannel = supabase
-      .channel("collaborator-updates")
+    const channel = supabase.channel(`collaborators-${documentId}`);
+
+    channel
       .on(
         "postgres_changes",
         {
@@ -40,17 +39,21 @@ export function useCollaboratorSync(documentId: string) {
           table: "collaborators",
           filter: `document_id=eq.${documentId}`,
         },
-        async () => {
-          // Refetch collaborators when any change occurs
-          await fetchCollaborators();
+        (payload) => {
+          console.log("Subscription payload:", payload);
+          if (payload.eventType === "DELETE") {
+            setCollaborators((prev) =>
+              prev.filter((c) => c.id !== payload.old.id)
+            );
+          } else fetchCollaborators();
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(collaboratorChannel);
+      supabase.removeChannel(channel);
     };
   }, [documentId]);
 
   return { collaborators, loading };
-}
+};

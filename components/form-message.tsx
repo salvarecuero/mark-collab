@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-
 export type Message =
   | { success: string }
   | { error: string }
