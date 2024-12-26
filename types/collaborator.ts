@@ -3,7 +3,7 @@ export type Collaborator = {
   document_id: string; // UUID (relates to Document)
   user_id: string; // UUID (relates to Profile)
   permission_level: "author" | "editor";
-  profile: {
+  profile?: {
     full_name: string;
   };
 };

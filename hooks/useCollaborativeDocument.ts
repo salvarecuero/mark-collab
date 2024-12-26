@@ -9,8 +9,10 @@ export function useCollaborativeDocument(documentId: string) {
   const supabase = createClient();
   const channelName = `document-${documentId}`;
 
+  // Identifies user session
   const sessionId = useRef(crypto.randomUUID());
 
+  // An event can be an edit, a chat message or a document-saved message
   const { events, sendEvent } = useRealtimeChannel(channelName);
   const { collaborators } = useCollaborators(documentId);
 
@@ -33,10 +35,22 @@ export function useCollaborativeDocument(documentId: string) {
 
   const saveToDatabase = async () => {
     setIsSaving(true);
+
     await supabase
       .from("documents")
       .update({ content: localContent, updated_at: new Date().toISOString() })
       .eq("id", documentId);
+
+    // TODO: Send a message to the channel to notify other users that the document has been updated
+    sendEvent({
+      type: "document-saved",
+      content: localContent,
+      timestamp: new Date().toISOString(),
+      user_id: user?.id ?? "",
+      session_id: sessionId.current,
+      user_name: user?.full_name ?? "",
+    });
+
     hasChangesSinceLastSave.current = false;
     setIsSaving(false);
   };
@@ -76,27 +90,7 @@ export function useCollaborativeDocument(documentId: string) {
     [sendEvent, user?.id, sessionId.current, user?.full_name]
   );
 
-  useEffect(() => {
-    if (
-      events.length === 0 ||
-      events[events.length - 1].session_id === sessionId.current
-    )
-      return;
-
-    if (events[events.length - 1].type === "edit")
-      setLocalContent(events[events.length - 1].content);
-  }, [events.length]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (hasChangesSinceLastSave.current) {
-        saveToDatabase();
-      }
-    }, 10000); // 10 seconds
-
-    return () => clearInterval(interval);
-  }, [localContent]);
-
+  // Initializes the document content with the content from the database
   useEffect(() => {
     const fetchDocument = async () => {
       const { data, error } = await supabase
@@ -114,6 +108,34 @@ export function useCollaborativeDocument(documentId: string) {
 
     fetchDocument();
   }, [documentId]);
+
+  // Saves the document to the database every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (hasChangesSinceLastSave.current) {
+        saveToDatabase();
+      }
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, [localContent]);
+
+  // Updates the local content with the content from the database
+  useEffect(() => {
+    if (
+      events.length === 0 ||
+      events[events.length - 1].session_id === sessionId.current
+    )
+      return;
+
+    if (events[events.length - 1].type === "edit")
+      setLocalContent(events[events.length - 1].content);
+
+    if (events[events.length - 1].type === "document-saved") {
+      setLocalContent(events[events.length - 1].content);
+      hasChangesSinceLastSave.current = false;
+    }
+  }, [events.length]);
 
   return {
     localContent,

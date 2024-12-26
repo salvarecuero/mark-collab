@@ -4,13 +4,16 @@ import { API_ROUTES } from "@/constants/routes";
 import { Document } from "@/types/document";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/utils/supabase/client";
+import { Collaborator } from "@/types/collaborator";
 
 export function useUserDocuments(userId: string) {
   const supabase = createClient();
+
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Initializes the documents state with the documents from the database
   useEffect(() => {
     if (!userId) return;
 
@@ -37,6 +40,7 @@ export function useUserDocuments(userId: string) {
 
     loadDocuments();
 
+    // Subscribes to the real-time channel to update the documents state when a document is added or updated
     const documentsChannel = supabase
       .channel(`documents-${userId}`)
       .on(
@@ -64,17 +68,19 @@ export function useUserDocuments(userId: string) {
       )
       .subscribe();
 
+    // Subscribes to the real-time channel to update the documents when user is added or removed from a document
     const collaboratorsChannel = supabase
       .channel(`collaborators-${userId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "collaborators" },
         async (payload) => {
-          const {
-            eventType,
-            new: newCollaboration,
-            old: oldCollaboration,
-          } = payload;
+          const { eventType, new: newCollaboration } = payload;
+
+          // If the user is the author, do not update the documents state
+          // because documentsChannel is subscribed to the documents table
+          if ((newCollaboration as Collaborator).permission_level === "author")
+            return;
 
           if (eventType === "INSERT") {
             const { data: newDoc, error } = await supabase
@@ -84,15 +90,9 @@ export function useUserDocuments(userId: string) {
               .single();
 
             if (!error && newDoc) {
-              setDocuments((prev) => [...prev, newDoc as Document]);
+              setDocuments((prev) => [newDoc as Document, ...prev]);
             }
-          } else if (eventType === "DELETE") {
-            setDocuments((prev) =>
-              prev.filter(
-                (doc) => doc.id !== (oldCollaboration as any).document_id
-              )
-            );
-          }
+          } else if (eventType === "DELETE") loadDocuments();
         }
       )
       .subscribe();

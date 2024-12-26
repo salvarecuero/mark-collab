@@ -5,9 +5,12 @@ import { API_ROUTES } from "@/constants/routes";
 
 export const useCollaborators = (documentId: string) => {
   const supabase = createClient();
+
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Initializes the collaborators state with the collaborators from the database
+  // and subscribes to a real-time channel to update state when a collaborator is added or removed
   useEffect(() => {
     const fetchCollaborators = async () => {
       const url = API_ROUTES.DOCUMENTS.COLLABORATORS.LIST.replace(
@@ -40,7 +43,6 @@ export const useCollaborators = (documentId: string) => {
           filter: `document_id=eq.${documentId}`,
         },
         (payload) => {
-          console.log("Subscription payload:", payload);
           if (payload.eventType === "DELETE") {
             setCollaborators((prev) =>
               prev.filter((c) => c.id !== payload.old.id)

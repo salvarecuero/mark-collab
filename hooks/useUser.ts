@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 export const useUser = () => {
   const [user, setUser] = useState<Profile | null>(null);
 
+  // Initializes the user state with the user from the database
   useEffect(() => {
     async function fetchUser() {
       const response = await fetch(API_ROUTES.USER.CURRENT);

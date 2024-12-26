@@ -46,7 +46,7 @@ const AuthForm = ({ type, searchParams }: AuthFormProps) => {
           <Label htmlFor="password">Password</Label>
           {isSignIn && (
             <Link
-              className="text-xs text-foreground underline"
+              className="text-xs text-foreground underline text-white"
               href="/forgot-password"
             >
               Forgot Password?

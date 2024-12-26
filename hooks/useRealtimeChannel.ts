@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/utils/supabase/client";
 
 export interface ChannelEvent {
-  type: "edit" | "chat";
+  type: "edit" | "chat" | "document-saved";
   content: string;
   timestamp: string;
   user_id: string;
