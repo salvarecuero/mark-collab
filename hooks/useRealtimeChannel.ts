@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/utils/supabase/client";
 
 export interface ChannelEvent {
   type: "edit" | "chat";
@@ -12,14 +12,18 @@ export interface ChannelEvent {
 
 export function useRealtimeChannel(channelName: string) {
   const supabase = createClient();
-  const [messages, setMessages] = useState<ChannelEvent[]>([]);
+  const [events, setEvents] = useState<ChannelEvent[]>([]);
 
   useEffect(() => {
     const channel = supabase.channel(channelName);
 
-    channel.on("broadcast", { event: "message" }, (payload) => {
-      setMessages((prev) => [...prev, payload.payload]);
-    });
+    channel.on(
+      "broadcast",
+      { event: "message" },
+      (payload: { payload: ChannelEvent }) => {
+        setEvents((prev) => [...prev, payload.payload]);
+      }
+    );
 
     channel.subscribe();
 
@@ -28,13 +32,13 @@ export function useRealtimeChannel(channelName: string) {
     };
   }, [channelName]);
 
-  const sendMessage = (message: ChannelEvent) => {
+  const sendEvent = (event: ChannelEvent) => {
     supabase.channel(channelName).send({
       type: "broadcast",
       event: "message",
-      payload: message,
+      payload: event,
     });
   };
 
-  return { messages, sendMessage };
+  return { events, sendEvent };
 }

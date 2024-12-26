@@ -1,5 +1,5 @@
 import { Document } from "@/types/document";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/utils/supabase/server";
 import { NextResponse } from "next/server";
 
 type Params = Promise<{ id: string }>;

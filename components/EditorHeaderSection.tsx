@@ -1,19 +1,22 @@
-import { AddCollaboratorInput } from "@/components/AddCollaboratorInput";
-import { Collaborator } from "@/types/collaborator";
+import { Save } from "lucide-react";
 
 interface EditorHeaderSectionProps {
   hasChangesSinceLastSave: boolean;
   isSaving: boolean;
-  documentId: string;
+  saveDocument: () => void;
 }
 
 const EditorHeaderSection = ({
   hasChangesSinceLastSave,
   isSaving,
-  documentId,
+  saveDocument,
 }: EditorHeaderSectionProps) => {
   return (
     <div className="flex gap-x-5 items-center p-2 mx-auto">
+      <button onClick={saveDocument} title="Save document">
+        <Save size={24} />
+      </button>
+
       <span
         className={`font-bold ${hasChangesSinceLastSave || isSaving ? "italic" : ""}`}
       >

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/utils/supabase/client";
 import { Collaborator } from "@/types/collaborator";
 import { API_ROUTES } from "@/constants/routes";
 

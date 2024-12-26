@@ -1,5 +1,5 @@
 import IbelickBackground from "@/components/IbelickBackground";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/utils/supabase/server";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";

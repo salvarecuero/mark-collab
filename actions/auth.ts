@@ -1,7 +1,7 @@
 "use client";
 
 import { API_ROUTES } from "@/constants/routes";
-import { encodedRedirect } from "@/utils/utils";
+import { encodedRedirect } from "@/lib/utils";
 import { redirect } from "next/navigation";
 
 export const signUpAction = async (formData: FormData) => {

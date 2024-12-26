@@ -3,7 +3,7 @@
 import { API_ROUTES } from "@/constants/routes";
 import { Document } from "@/types/document";
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/utils/supabase/client";
 
 export function useUserDocuments(userId: string) {
   const supabase = createClient();

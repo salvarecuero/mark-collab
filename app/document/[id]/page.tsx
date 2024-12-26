@@ -25,6 +25,7 @@ export default function Page() {
     chatMessages,
     collaborators,
     userIsAuthor,
+    saveDocument,
   } = useCollaborativeDocument(id);
 
   return (
@@ -36,7 +37,7 @@ export default function Page() {
         <EditorHeaderSection
           hasChangesSinceLastSave={hasChangesSinceLastSave}
           isSaving={isSaving}
-          documentId={id}
+          saveDocument={saveDocument}
         />
       </Header>
 

@@ -1,9 +1,9 @@
 import { signInAction, signUpAction } from "@/actions/auth";
-import { FormMessage, Message } from "@/components/form-message";
-import { SubmitButton } from "@/components/submit-button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import FormMessage, { Message } from "./FormMessage";
+import Input from "./input";
+import Label from "./label";
+import SubmitButton from "./SubmitButton";
 
 interface AuthFormProps {
   type: "sign-in" | "sign-up";

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/utils/supabase/client";
 import { useThrottledCallback } from "./useThrottledCallback";
 import { useUser } from "./useUser";
 import { useCollaborators } from "./useCollaborators";
@@ -11,19 +11,20 @@ export function useCollaborativeDocument(documentId: string) {
 
   const sessionId = useRef(crypto.randomUUID());
 
-  const { messages, sendMessage } = useRealtimeChannel(channelName);
+  const { events, sendEvent } = useRealtimeChannel(channelName);
   const { collaborators } = useCollaborators(documentId);
 
   const user = useUser();
   const userIsAuthor = useMemo(() => {
     if (!user) return false;
-    return (
+
+    return !!(
       collaborators.find((collaborator) => collaborator.user_id === user?.id)
         ?.permission_level === "author"
     );
   }, [collaborators, user?.id]);
 
-  const chatMessages = messages.filter((message) => message.type === "chat");
+  const chatMessages = events.filter((event) => event.type === "chat");
 
   const [localContent, setLocalContent] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
@@ -42,7 +43,7 @@ export function useCollaborativeDocument(documentId: string) {
 
   const throttledSendUpdate = useThrottledCallback(
     (content: string) => {
-      sendMessage({
+      sendEvent({
         type: "edit",
         content,
         timestamp: new Date().toISOString(),
@@ -63,7 +64,7 @@ export function useCollaborativeDocument(documentId: string) {
 
   const handleChatMessage = useCallback(
     (newMessage: string) => {
-      sendMessage({
+      sendEvent({
         type: "chat",
         content: newMessage,
         timestamp: new Date().toISOString(),
@@ -72,26 +73,26 @@ export function useCollaborativeDocument(documentId: string) {
         user_name: user?.full_name ?? "",
       });
     },
-    [sendMessage, user?.id, sessionId.current, user?.full_name]
+    [sendEvent, user?.id, sessionId.current, user?.full_name]
   );
 
   useEffect(() => {
     if (
-      messages.length === 0 ||
-      messages[messages.length - 1].session_id === sessionId.current
+      events.length === 0 ||
+      events[events.length - 1].session_id === sessionId.current
     )
       return;
 
-    if (messages[messages.length - 1].type === "edit")
-      setLocalContent(messages[messages.length - 1].content);
-  }, [messages.length]);
+    if (events[events.length - 1].type === "edit")
+      setLocalContent(events[events.length - 1].content);
+  }, [events.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (hasChangesSinceLastSave.current) {
         saveToDatabase();
       }
-    }, 10000);
+    }, 10000); // 10 seconds
 
     return () => clearInterval(interval);
   }, [localContent]);
@@ -124,5 +125,6 @@ export function useCollaborativeDocument(documentId: string) {
     chatMessages,
     collaborators,
     userIsAuthor,
+    saveDocument: saveToDatabase,
   };
 }
