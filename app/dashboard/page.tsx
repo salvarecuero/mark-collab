@@ -6,16 +6,20 @@ import Spinner from "@/components/Spinner";
 import { useUser } from "@/hooks/useUser";
 import { useUserDocuments } from "@/hooks/useUserDocuments";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Dashboard() {
   const user = useUser();
   const { documents, loading } = useUserDocuments(user?.id || "");
   const router = useRouter();
+  const [isCreatingDocument, setIsCreatingDocument] = useState(false);
 
   const handleCreateDocument = async () => {
+    setIsCreatingDocument(true);
     const document = await createDocument("New document", "", user?.id || "");
 
     if (document.id) router.push(`/document/${document.id}`);
+    setIsCreatingDocument(false);
   };
 
   return (
@@ -27,10 +31,15 @@ export default function Dashboard() {
           <h1 className="text-4xl font-bold">Your projects</h1>
 
           <button
-            className="bg-violet-900 text-white px-4 py-2 rounded-md font-semibold"
+            className="bg-violet-900 flex justify-center items-center px-4 py-2 rounded-md font-semibold"
             onClick={handleCreateDocument}
+            disabled={isCreatingDocument}
           >
-            Create Document
+            {isCreatingDocument ? (
+              <Spinner className="w-6 h-6" />
+            ) : (
+              "Create Document"
+            )}
           </button>
 
           <DocumentList documents={documents} />
