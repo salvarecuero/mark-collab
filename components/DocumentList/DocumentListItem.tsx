@@ -3,7 +3,7 @@ import { Document } from "@/types/document";
 import { DocumentTitle } from "./DocumentTitle";
 import { DocumentActions } from "./DocumentActions";
 import DocumentDetails from "./DocumentDetails";
-import { useUser } from "@/hooks/useUser";
+
 interface DocumentListItemProps {
   document: Document;
   onSave: (id: string, title: string) => void;

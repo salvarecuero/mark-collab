@@ -2,6 +2,7 @@ import { deleteDocument, updateDocument } from "@/actions/document";
 import { Document } from "@/types/document";
 import DocumentListItem from "./DocumentListItem";
 import { useUser } from "@/hooks/useUser";
+
 const DocumentList = ({ documents }: { documents: Document[] }) => {
   const user = useUser();
 

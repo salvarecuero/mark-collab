@@ -10,6 +10,7 @@ export const API_ROUTES = {
     CREATE: "/api/documents",
     UPDATE: "/api/documents/:id",
     DELETE: "/api/documents/:id",
+    GET: "/api/documents/:id",
     COLLABORATORS: {
       LIST: "/api/documents/:id/collaborators",
       ADD: "/api/documents/:id/collaborators",

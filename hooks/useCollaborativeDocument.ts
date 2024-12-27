@@ -4,6 +4,7 @@ import { createClient } from "@/lib/utils/supabase/client";
 import { useThrottledCallback } from "./useThrottledCallback";
 import { useUser } from "./useUser";
 import { useCollaborators } from "./useCollaborators";
+import { getDocument } from "@/actions/document";
 
 export function useCollaborativeDocument(documentId: string) {
   const supabase = createClient();
@@ -33,18 +34,29 @@ export function useCollaborativeDocument(documentId: string) {
 
   const hasChangesSinceLastSave = useRef(false);
 
-  const saveToDatabase = async () => {
+  const [documentTitle, setDocumentTitle] = useState<string>("");
+
+  const saveToDatabase = async (
+    type: "document-saved" | "title-saved",
+    content?: string
+  ) => {
+    const newContent =
+      content ?? (type === "document-saved" ? localContent : documentTitle);
+
     setIsSaving(true);
 
     await supabase
       .from("documents")
-      .update({ content: localContent, updated_at: new Date().toISOString() })
+      .update({
+        updated_at: new Date().toISOString(),
+        ...(type === "title-saved" && { title: newContent }),
+        ...(type === "document-saved" && { content: newContent }),
+      })
       .eq("id", documentId);
 
-    // TODO: Send a message to the channel to notify other users that the document has been updated
     sendEvent({
-      type: "document-saved",
-      content: localContent,
+      type,
+      content: newContent,
       timestamp: new Date().toISOString(),
       user_id: user?.id ?? "",
       session_id: sessionId.current,
@@ -90,22 +102,15 @@ export function useCollaborativeDocument(documentId: string) {
     [sendEvent, user?.id, sessionId.current, user?.full_name]
   );
 
+  const fetchDocument = useCallback(async () => {
+    const document = await getDocument(documentId);
+
+    setLocalContent(document.content);
+    setDocumentTitle(document.title);
+  }, [documentId]);
+
   // Initializes the document content with the content from the database
   useEffect(() => {
-    const fetchDocument = async () => {
-      const { data, error } = await supabase
-        .from("documents")
-        .select("content")
-        .eq("id", documentId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching document:", error);
-        return;
-      }
-      setLocalContent(data.content);
-    };
-
     fetchDocument();
   }, [documentId]);
 
@@ -113,7 +118,7 @@ export function useCollaborativeDocument(documentId: string) {
   useEffect(() => {
     const interval = setInterval(() => {
       if (hasChangesSinceLastSave.current) {
-        saveToDatabase();
+        saveToDatabase("document-saved");
       }
     }, 10000); // 10 seconds
 
@@ -135,18 +140,23 @@ export function useCollaborativeDocument(documentId: string) {
       setLocalContent(events[events.length - 1].content);
       hasChangesSinceLastSave.current = false;
     }
+
+    if (events[events.length - 1].type === "title-saved") {
+      setDocumentTitle(events[events.length - 1].content);
+    }
   }, [events.length]);
 
   return {
     localContent,
+    documentTitle,
+    setDocumentTitle,
     handleLocalChange,
-    saveToDatabase,
+    saveDocument: saveToDatabase,
     isSaving,
     hasChangesSinceLastSave: hasChangesSinceLastSave.current,
     handleChatMessage,
     chatMessages,
     collaborators,
     userIsAuthor,
-    saveDocument: saveToDatabase,
   };
 }

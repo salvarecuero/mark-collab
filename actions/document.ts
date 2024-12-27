@@ -3,6 +3,19 @@
 import { API_ROUTES } from "@/constants/routes";
 import { Document } from "@/types/document";
 
+export async function getDocument(documentId: string): Promise<Document> {
+  const response = await fetch(
+    API_ROUTES.DOCUMENTS.GET.replace(":id", documentId)
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message);
+  }
+
+  return response.json();
+}
+
 export async function createDocument(
   title: string,
   content: string,

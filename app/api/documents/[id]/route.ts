@@ -4,6 +4,23 @@ import { NextResponse } from "next/server";
 
 type Params = Promise<{ id: string }>;
 
+export async function GET(request: Request, segmentData: { params: Params }) {
+  const { id: documentId } = await segmentData.params;
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("documents")
+    .select("*")
+    .eq("id", documentId)
+    .single();
+
+  if (error) {
+    return NextResponse.json({ ...error });
+  }
+
+  return NextResponse.json(data);
+}
+
 export async function PUT(request: Request, segmentData: { params: Params }) {
   const updates: Partial<Document> = await request.json();
   const { id: documentId } = await segmentData.params;

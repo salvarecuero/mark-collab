@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 interface DocumentTitleProps {
@@ -6,6 +7,8 @@ interface DocumentTitleProps {
   newTitle: string;
   documentId: string;
   onTitleChange: (value: string) => void;
+  enableRedirection?: boolean;
+  className?: string;
 }
 
 export const DocumentTitle = ({
@@ -14,7 +17,11 @@ export const DocumentTitle = ({
   newTitle,
   documentId,
   onTitleChange,
+  enableRedirection = true,
+  className = "",
 }: DocumentTitleProps) => {
+  const titleClassName = cn("flex flex-1 justify-center truncate", className);
+
   if (isEditing) {
     return (
       <input
@@ -27,12 +34,11 @@ export const DocumentTitle = ({
     );
   }
 
-  return (
-    <Link
-      className="flex flex-1 justify-center truncate"
-      href={`/document/${documentId}`}
-    >
+  return enableRedirection ? (
+    <Link className={titleClassName} href={`/document/${documentId}`}>
       {title}
     </Link>
+  ) : (
+    <span className={titleClassName}>{title}</span>
   );
 };

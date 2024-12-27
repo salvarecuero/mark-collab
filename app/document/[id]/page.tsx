@@ -7,7 +7,7 @@ import "./markdown.css";
 import remarkGfm from "remark-gfm";
 import Header from "@/components/Header";
 import EditorHeaderSection from "@/components/EditorHeaderSection";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DocumentSidebar from "@/components/DocumentSidebar";
 
 export default function Page() {
@@ -26,7 +26,20 @@ export default function Page() {
     collaborators,
     userIsAuthor,
     saveDocument,
+    documentTitle,
+    setDocumentTitle,
   } = useCollaborativeDocument(id);
+
+  const handleTitleChange = (newTitle: string) => {
+    setDocumentTitle(newTitle);
+    saveDocument("title-saved", newTitle);
+  };
+
+  useEffect(() => {
+    if (documentTitle) {
+      document.title = `${documentTitle} - Mark-Collab`;
+    }
+  }, [documentTitle]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -38,6 +51,9 @@ export default function Page() {
           hasChangesSinceLastSave={hasChangesSinceLastSave}
           isSaving={isSaving}
           saveDocument={saveDocument}
+          title={documentTitle}
+          onTitleChange={handleTitleChange}
+          documentId={id as string}
         />
       </Header>
 

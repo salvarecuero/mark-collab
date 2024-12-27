@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/utils/supabase/client";
 import { Collaborator } from "@/types/collaborator";
 import { API_ROUTES } from "@/constants/routes";
+import { getDocumentCollaborators } from "@/actions/collaborator";
 
 export const useCollaborators = (documentId: string) => {
   const supabase = createClient();
@@ -13,20 +14,8 @@ export const useCollaborators = (documentId: string) => {
   // and subscribes to a real-time channel to update state when a collaborator is added or removed
   useEffect(() => {
     const fetchCollaborators = async () => {
-      const url = API_ROUTES.DOCUMENTS.COLLABORATORS.LIST.replace(
-        ":id",
-        documentId
-      );
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Failed to fetch collaborators");
-        const data = await response.json();
-        setCollaborators(data);
-      } catch (error) {
-        console.error("Error fetching collaborators:", error);
-      } finally {
-        setLoading(false);
-      }
+      const collaborators = await getDocumentCollaborators(documentId);
+      setCollaborators(collaborators);
     };
 
     fetchCollaborators();

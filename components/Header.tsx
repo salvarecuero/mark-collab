@@ -19,7 +19,9 @@ const Header = ({
           <Logo className={cn("text-4xl", logoClassName)} />
         </Link>
 
-        <div className="items-center hidden md:flex">{children}</div>
+        <div className="items-center hidden md:flex flex-1 justify-center">
+          {children}
+        </div>
 
         <div className="flex items-center gap-2">
           <SignOutButton />
