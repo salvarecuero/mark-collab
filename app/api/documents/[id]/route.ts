@@ -4,21 +4,44 @@ import { NextResponse } from "next/server";
 
 type Params = Promise<{ id: string }>;
 
-export async function GET(request: Request, segmentData: { params: Params }) {
+export async function GET(_request: Request, segmentData: { params: Params }) {
   const { id: documentId } = await segmentData.params;
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  // Get document with owner info
+  const { data: document, error } = await supabase
     .from("documents")
-    .select("*")
+    .select(
+      `
+      *,
+      collaborators(user_id, permission_level)
+    `
+    )
     .eq("id", documentId)
     .single();
 
   if (error) {
-    return NextResponse.json({ ...error });
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  return NextResponse.json(data);
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Check access
+  const isCollaborator = document.collaborators.some(
+    (c: any) => c.user_id === user?.id
+  );
+
+  if (!document.is_public && !isCollaborator) {
+    return NextResponse.json(
+      { error: "You don't have access to this document" },
+      { status: 403 }
+    );
+  }
+
+  return NextResponse.json(document);
 }
 
 export async function PUT(request: Request, segmentData: { params: Params }) {

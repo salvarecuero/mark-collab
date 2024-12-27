@@ -9,6 +9,8 @@ import Header from "@/components/Header";
 import EditorHeaderSection from "@/components/EditorHeaderSection";
 import { useState, useEffect } from "react";
 import DocumentSidebar from "@/components/DocumentSidebar";
+import DocumentError from "@/components/DocumentError";
+import Spinner from "@/components/Spinner";
 
 export default function Page() {
   const params = useParams();
@@ -28,6 +30,8 @@ export default function Page() {
     saveDocument,
     documentTitle,
     setDocumentTitle,
+    isLoadingFirstTime,
+    hasAccess,
   } = useCollaborativeDocument(id);
 
   const handleTitleChange = (newTitle: string) => {
@@ -40,6 +44,13 @@ export default function Page() {
       document.title = `${documentTitle} - Mark-Collab`;
     }
   }, [documentTitle]);
+
+  if (isLoadingFirstTime || !hasAccess)
+    return (
+      <div className="flex justify-center items-center h-screen bg-[#1b1b1f]">
+        {isLoadingFirstTime ? <Spinner /> : <DocumentError />}
+      </div>
+    );
 
   return (
     <div className="flex flex-col h-screen">

@@ -8,10 +8,7 @@ export async function getDocument(documentId: string): Promise<Document> {
     API_ROUTES.DOCUMENTS.GET.replace(":id", documentId)
   );
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message);
-  }
+  if (!response.ok) throw new Error();
 
   return response.json();
 }

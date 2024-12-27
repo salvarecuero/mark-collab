@@ -16,6 +16,8 @@ export function useCollaborativeDocument(documentId: string) {
   // An event can be an edit, a chat message or a document-saved message
   const { events, sendEvent } = useRealtimeChannel(channelName);
   const { collaborators } = useCollaborators(documentId);
+  const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
 
   const user = useUser();
   const userIsAuthor = useMemo(() => {
@@ -103,10 +105,18 @@ export function useCollaborativeDocument(documentId: string) {
   );
 
   const fetchDocument = useCallback(async () => {
-    const document = await getDocument(documentId);
+    try {
+      const document = await getDocument(documentId);
+      setLocalContent(document.content);
+      setDocumentTitle(document.title);
 
-    setLocalContent(document.content);
-    setDocumentTitle(document.title);
+      setIsLoadingFirstTime(false);
+      setHasAccess(true);
+    } catch (error) {
+      console.log(error);
+      setIsLoadingFirstTime(false);
+      setHasAccess(false);
+    }
   }, [documentId]);
 
   // Initializes the document content with the content from the database
@@ -158,5 +168,7 @@ export function useCollaborativeDocument(documentId: string) {
     chatMessages,
     collaborators,
     userIsAuthor,
+    hasAccess,
+    isLoadingFirstTime,
   };
 }
