@@ -17,7 +17,8 @@ export function useCollaborativeDocument(documentId: string) {
   const { events, sendEvent } = useRealtimeChannel(channelName);
   const { collaborators } = useCollaborators(documentId);
   const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(true);
-  const [hasAccess, setHasAccess] = useState(false);
+  const [isCollaborator, setIsCollaborator] = useState(false);
+  const [isPublicDocument, setIsPublicDocument] = useState(false);
 
   const user = useUser();
   const userIsAuthor = useMemo(() => {
@@ -109,13 +110,14 @@ export function useCollaborativeDocument(documentId: string) {
       const document = await getDocument(documentId);
       setLocalContent(document.content);
       setDocumentTitle(document.title);
+      setIsPublicDocument(document.is_public ?? false);
 
       setIsLoadingFirstTime(false);
-      setHasAccess(true);
     } catch (error) {
       console.log(error);
+
       setIsLoadingFirstTime(false);
-      setHasAccess(false);
+      setIsPublicDocument(false);
     }
   }, [documentId]);
 
@@ -156,6 +158,14 @@ export function useCollaborativeDocument(documentId: string) {
     }
   }, [events.length]);
 
+  useEffect(() => {
+    if (collaborators.length === 0) return;
+
+    setIsCollaborator(
+      !!collaborators.find((collaborator) => collaborator.user_id === user?.id)
+    );
+  }, [collaborators, user?.id]);
+
   return {
     localContent,
     documentTitle,
@@ -168,7 +178,8 @@ export function useCollaborativeDocument(documentId: string) {
     chatMessages,
     collaborators,
     userIsAuthor,
-    hasAccess,
+    isCollaborator,
+    isPublicDocument,
     isLoadingFirstTime,
   };
 }

@@ -1,19 +1,25 @@
-import { Pencil, Check, Trash, X } from "lucide-react";
+import { Pencil, Check, Trash, X, Eye, EyeOff } from "lucide-react";
 
 interface DocumentActionsProps {
   isEditing: boolean;
+  isPublic: boolean;
+  isOwner: boolean;
   onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
   onDelete: () => void;
+  onTogglePublic: () => void;
 }
 
 export const DocumentActions = ({
   isEditing,
+  isPublic,
+  isOwner,
   onEdit,
   onSave,
   onCancel,
   onDelete,
+  onTogglePublic,
 }: DocumentActionsProps) => {
   if (isEditing) {
     return (
@@ -33,9 +39,21 @@ export const DocumentActions = ({
       <button onClick={onEdit} title="Edit">
         <Pencil size={16} />
       </button>
-      <button onClick={onDelete} title="Delete">
-        <Trash size={16} />
-      </button>
+
+      {isOwner && (
+        <button
+          onClick={onTogglePublic}
+          title={isPublic ? "Make private" : "Make public"}
+        >
+          {isPublic ? <Eye size={16} /> : <EyeOff size={16} />}
+        </button>
+      )}
+
+      {isOwner && (
+        <button onClick={onDelete} title="Delete">
+          <Trash size={16} />
+        </button>
+      )}
     </div>
   );
 };

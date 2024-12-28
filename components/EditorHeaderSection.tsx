@@ -8,6 +8,7 @@ interface EditorHeaderSectionProps {
   title: string;
   onTitleChange: (newTitle: string) => void;
   documentId: string;
+  isCollaborator: boolean;
 }
 
 const EditorHeaderSection = ({
@@ -17,6 +18,7 @@ const EditorHeaderSection = ({
   title,
   onTitleChange,
   documentId,
+  isCollaborator,
 }: EditorHeaderSectionProps) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
@@ -48,29 +50,35 @@ const EditorHeaderSection = ({
           className="justify-end"
         />
 
-        {isEditingTitle ? (
-          <div className="flex gap-2">
-            <button onClick={handleSave} title="Save">
-              <Check size={16} />
-            </button>
-            <button onClick={handleCancel} title="Cancel">
-              <X size={16} />
-            </button>
-          </div>
-        ) : (
-          <button onClick={() => setIsEditingTitle(true)} title="Edit">
-            <Pencil size={16} />
-          </button>
+        {isCollaborator && (
+          <>
+            {isEditingTitle ? (
+              <div className="flex gap-2">
+                <button onClick={handleSave} title="Save">
+                  <Check size={16} />
+                </button>
+                <button onClick={handleCancel} title="Cancel">
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => setIsEditingTitle(true)} title="Edit">
+                <Pencil size={16} />
+              </button>
+            )}
+          </>
         )}
       </div>
 
       <div className="flex items-center gap-x-2 w-1/2">
-        <button
-          onClick={() => saveDocument("document-saved")}
-          title="Save document"
-        >
-          <Save size={24} />
-        </button>
+        {isCollaborator && (
+          <button
+            onClick={() => saveDocument("document-saved")}
+            title="Save document"
+          >
+            <Save size={24} />
+          </button>
+        )}
 
         <span
           className={`font-bold ${hasChangesSinceLastSave || isSaving ? "italic" : ""}`}

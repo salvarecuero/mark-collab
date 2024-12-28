@@ -31,8 +31,11 @@ export default function Page() {
     documentTitle,
     setDocumentTitle,
     isLoadingFirstTime,
-    hasAccess,
+    isCollaborator,
+    isPublicDocument,
   } = useCollaborativeDocument(id);
+
+  const hasAccess = isCollaborator || isPublicDocument;
 
   const handleTitleChange = (newTitle: string) => {
     setDocumentTitle(newTitle);
@@ -65,6 +68,7 @@ export default function Page() {
           title={documentTitle}
           onTitleChange={handleTitleChange}
           documentId={id as string}
+          isCollaborator={isCollaborator}
         />
       </Header>
 
@@ -72,10 +76,13 @@ export default function Page() {
         <textarea
           className="flex-1 h-full text-2xl p-4 outline-none bg-[#1b1b1f] resize-none text-white font-medium"
           value={localContent}
-          onChange={(e) => handleLocalChange(e.target.value)}
+          onChange={(e) => {
+            if (isCollaborator) handleLocalChange(e.target.value);
+          }}
           placeholder="Write your markdown here..."
           spellCheck={false}
           autoFocus={true}
+          disabled={!isCollaborator}
         />
 
         <div className="w-1/2 border-l border-gray-300 bg-[#161618] text-white overflow-y-auto px-4 py-2">

@@ -3,6 +3,7 @@ import { Document } from "@/types/document";
 import { DocumentTitle } from "./DocumentTitle";
 import { DocumentActions } from "./DocumentActions";
 import DocumentDetails from "./DocumentDetails";
+import { updateDocument } from "@/actions/document";
 
 interface DocumentListItemProps {
   document: Document;
@@ -19,6 +20,16 @@ const DocumentListItem = ({
 }: DocumentListItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(document.title);
+  const [isPublic, setIsPublic] = useState(document.is_public);
+
+  const handleTogglePublic = async () => {
+    try {
+      await updateDocument(document.id, { is_public: !isPublic });
+      setIsPublic(!isPublic);
+    } catch (error) {
+      console.error("Failed to toggle document visibility:", error);
+    }
+  };
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -49,10 +60,13 @@ const DocumentListItem = ({
 
       <DocumentActions
         isEditing={isEditing}
+        isPublic={isPublic}
+        isOwner={isOwner}
         onEdit={handleEdit}
         onSave={handleSave}
         onCancel={handleCancel}
         onDelete={() => onDelete(document.id)}
+        onTogglePublic={handleTogglePublic}
       />
     </li>
   );

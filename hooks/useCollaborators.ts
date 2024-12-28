@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/utils/supabase/client";
 import { Collaborator } from "@/types/collaborator";
-import { API_ROUTES } from "@/constants/routes";
 import { getDocumentCollaborators } from "@/actions/collaborator";
 
 export const useCollaborators = (documentId: string) => {
   const supabase = createClient();
 
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Initializes the collaborators state with the collaborators from the database
   // and subscribes to a real-time channel to update state when a collaborator is added or removed
   useEffect(() => {
     const fetchCollaborators = async () => {
-      const collaborators = await getDocumentCollaborators(documentId);
-      setCollaborators(collaborators);
+      try {
+        const collaborators = await getDocumentCollaborators(documentId);
+        setCollaborators(collaborators);
+      } catch (error) {
+        setCollaborators([]);
+      }
     };
 
     fetchCollaborators();
@@ -46,5 +48,5 @@ export const useCollaborators = (documentId: string) => {
     };
   }, [documentId]);
 
-  return { collaborators, loading };
+  return { collaborators };
 };

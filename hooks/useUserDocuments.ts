@@ -10,7 +10,7 @@ export function useUserDocuments(userId: string) {
   const supabase = createClient();
 
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   // Initializes the documents state with the documents from the database
@@ -19,7 +19,6 @@ export function useUserDocuments(userId: string) {
 
     async function loadDocuments() {
       try {
-        setLoading(true);
         const response = await fetch(
           `${API_ROUTES.USER.DOCUMENTS}?userId=${userId}`
         );
@@ -34,7 +33,7 @@ export function useUserDocuments(userId: string) {
       } catch (err) {
         setError(err as Error);
       } finally {
-        setLoading(false);
+        setIsLoadingFirstTime(false);
       }
     }
 
@@ -103,5 +102,5 @@ export function useUserDocuments(userId: string) {
     };
   }, [userId]);
 
-  return { documents, loading, error };
+  return { documents, loading: isLoadingFirstTime, error };
 }
