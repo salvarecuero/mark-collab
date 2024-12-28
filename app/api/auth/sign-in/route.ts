@@ -11,7 +11,12 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ ...error });
+    return NextResponse.json({
+      message:
+        error.message === "email_not_confirmed"
+          ? "Please check your email for verification."
+          : error.message,
+    });
   }
 
   return NextResponse.json({ data });
