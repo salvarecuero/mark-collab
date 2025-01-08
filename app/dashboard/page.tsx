@@ -3,6 +3,7 @@
 import { createDocument } from "@/actions/document";
 import DocumentList from "@/components/DocumentList";
 import Spinner from "@/components/Spinner";
+import MARKDOWN_TEMPLATE from "@/constants/markdown-template";
 import { useUser } from "@/hooks/useUser";
 import { useUserDocuments } from "@/hooks/useUserDocuments";
 import { useRouter } from "next/navigation";
@@ -16,7 +17,11 @@ export default function Dashboard() {
 
   const handleCreateDocument = async () => {
     setIsCreatingDocument(true);
-    const document = await createDocument("New document", "", user?.id || "");
+    const document = await createDocument(
+      "New document",
+      MARKDOWN_TEMPLATE,
+      user?.id || ""
+    );
 
     if (document.id) router.push(`/document/${document.id}`);
     setIsCreatingDocument(false);
