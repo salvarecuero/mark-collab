@@ -13,7 +13,6 @@ export function useUserDocuments(userId: string) {
   const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Initializes the documents state with the documents from the database
   useEffect(() => {
     if (!userId) return;
 
@@ -39,12 +38,17 @@ export function useUserDocuments(userId: string) {
 
     loadDocuments();
 
-    // Subscribes to the real-time channel to update the documents state when a document is added or updated
+    // Subscribes to document changes
     const documentsChannel = supabase
       .channel(`documents-${userId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "documents" },
+        {
+          event: "*",
+          schema: "public",
+          table: "documents",
+          filter: `owner_id=eq.${userId}`,
+        },
         (payload) => {
           const { eventType, new: newDoc, old: oldDoc } = payload;
 
@@ -55,45 +59,56 @@ export function useUserDocuments(userId: string) {
               const updatedList = prev.filter(
                 (doc) => doc.id !== (newDoc as Document).id
               );
-
               return [newDoc as Document, ...updatedList];
             });
-          } else if (eventType === "DELETE") {
-            setDocuments((prev) =>
-              prev.filter((doc) => doc.id !== (oldDoc as any).id)
-            );
           }
         }
       )
+      .on("broadcast", { event: "document_deleted" }, (payload: any) => {
+        setDocuments((prev) =>
+          prev.filter((doc) => doc.id !== payload.payload.document_id)
+        );
+      })
       .subscribe();
 
-    // Subscribes to the real-time channel to update the documents when user is added or removed from a document
+    // Subscribes to collaborator changes
     const collaboratorsChannel = supabase
       .channel(`collaborators-${userId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "collaborators" },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "collaborators",
+          filter: `user_id=eq.${userId}`,
+        },
         async (payload) => {
-          const { eventType, new: newCollaboration } = payload;
+          const { new: newCollaboration } = payload;
 
           // If the user is the author, do not update the documents state
           // because documentsChannel is subscribed to the documents table
           if ((newCollaboration as Collaborator).permission_level === "author")
             return;
 
-          if (eventType === "INSERT") {
-            const { data: newDoc, error } = await supabase
-              .from("documents")
-              .select("*")
-              .eq("id", newCollaboration.document_id)
-              .single();
+          const { data: newDoc, error } = await supabase
+            .from("documents")
+            .select("*")
+            .eq("id", newCollaboration.document_id)
+            .single();
 
-            if (!error && newDoc) {
-              setDocuments((prev) => [newDoc as Document, ...prev]);
-            }
-          } else if (eventType === "DELETE") loadDocuments();
+          if (!error && newDoc) {
+            setDocuments((prev) => [newDoc as Document, ...prev]);
+          }
         }
       )
+      // Listen for manual broadcast events when collaborator is removed
+      .on("broadcast", { event: "collaborator_deleted" }, (payload: any) => {
+        if (payload.payload.user_id === userId) {
+          setDocuments((prev) =>
+            prev.filter((doc) => doc.id !== payload.payload.document_id)
+          );
+        }
+      })
       .subscribe();
 
     return () => {

@@ -72,14 +72,25 @@ export async function DELETE(
   const { id: documentId } = await segmentData.params;
   const supabase = await createClient();
 
-  const { error } = await supabase
+  const { data: document, error } = await supabase
     .from("documents")
     .delete()
-    .eq("id", documentId);
+    .eq("id", documentId)
+    .select("owner_id")
+    .single();
 
   if (error) {
     return NextResponse.json({ ...error });
   }
+
+  // Broadcast to document channel
+  await supabase.channel(`documents-${document?.owner_id}`).send({
+    type: "broadcast",
+    event: "document_deleted",
+    payload: {
+      document_id: documentId,
+    },
+  });
 
   return NextResponse.json({ message: "Document deleted successfully" });
 }

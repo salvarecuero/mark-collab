@@ -28,19 +28,20 @@ export const useCollaborators = (documentId: string) => {
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "INSERT",
           schema: "public",
           table: "collaborators",
           filter: `document_id=eq.${documentId}`,
         },
-        (payload) => {
-          if (payload.eventType === "DELETE") {
-            setCollaborators((prev) =>
-              prev.filter((c) => c.id !== payload.old.id)
-            );
-          } else fetchCollaborators();
-        }
+        fetchCollaborators
       )
+      .on("broadcast", { event: "collaborator_deleted" }, (payload: any) => {
+        if (payload.payload.document_id === documentId) {
+          setCollaborators((prev) =>
+            prev.filter((c) => c.id !== payload.payload.id)
+          );
+        }
+      })
       .subscribe();
 
     return () => {

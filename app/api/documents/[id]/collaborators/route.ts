@@ -80,11 +80,14 @@ export async function DELETE(
     );
   }
 
-  const { error: deleteError } = await supabase
+  // Combined delete and fetch operation
+  const { data: deletedCollaborator, error: deleteError } = await supabase
     .from("collaborators")
     .delete()
     .eq("id", collaboratorId)
-    .eq("document_id", documentId);
+    .eq("document_id", documentId)
+    .select("user_id")
+    .single();
 
   if (deleteError) {
     return NextResponse.json(
@@ -92,6 +95,26 @@ export async function DELETE(
       { status: 500 }
     );
   }
+
+  // Broadcast to document channel
+  await supabase.channel(`collaborators-${documentId}`).send({
+    type: "broadcast",
+    event: "collaborator_deleted",
+    payload: {
+      document_id: documentId,
+      id: collaboratorId,
+    },
+  });
+
+  // Broadcast to user channel using the user_id from the delete operation
+  await supabase.channel(`collaborators-${deletedCollaborator?.user_id}`).send({
+    type: "broadcast",
+    event: "collaborator_deleted",
+    payload: {
+      document_id: documentId,
+      user_id: deletedCollaborator.user_id,
+    },
+  });
 
   return NextResponse.json({ message: "Collaborator deleted successfully" });
 }

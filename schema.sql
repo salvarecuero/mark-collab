@@ -104,6 +104,11 @@ ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.documents DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.collaborators DISABLE ROW LEVEL SECURITY;
 
+-- Enable realtime for tables
+ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.documents;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.collaborators;
+
 -- Tabla: collaborators
 CREATE POLICY view_collaborators ON public.collaborators
     FOR SELECT
